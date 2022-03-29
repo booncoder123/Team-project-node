@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Logger from '../loaders/logger.js';
+
 import config from '../config/index.js';
 
 async function connectMongo() {
@@ -10,10 +10,10 @@ async function connectMongo() {
       useUnifiedTopology: true,
     })
     .then(() => {
-      Logger.info(` 🎈 Server connecting to database 🎈   `);
+     console.log(` 🎈 Server connecting to database 🎈   `);
     })
     .catch(error => {
-      Logger.error(error);
+      console.log(error);
       process.exit(1);
     });
 }

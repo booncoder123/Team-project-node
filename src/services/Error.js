@@ -1,4 +1,4 @@
-class Error {
+class ErrorService {
   constructor(code, message) {
     this.code = code;
     this.message = message;
@@ -11,6 +11,10 @@ class Error {
   static internal(msg) {
     return new Error(500, msg);
   }
+
+  static forBidden(msg) {
+    return new Error(403, msg);
+  }
 }
 
-export default Error;
+export default ErrorService;
