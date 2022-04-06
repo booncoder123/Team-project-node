@@ -1,34 +1,33 @@
 import mongoose from 'mongoose';
 import Post from '../model/post.model.js';
 import User from '../model/user.model.js';
-// import s3Service from '../services/s3.service.js';
+import s3Service from '../services/s3.service.js';
 
 async function createPost(req, res, next) {
   const session = await Post.startSession();
   session.startTransaction();
 
   try {
-    const { uid, description, images, postType, type, likes } = req.body;
+    const { uid } = req;
+
+    const { description, postType } = req.body;
+    const { files } = req;
 
     const user = await User.findOne({ uid });
     if (user) {
       const { _id } = user;
       //! images file from user
-      const { files } = req;
 
-      images = await s3Service.uploadFiles(files, uid, 'posts');
+      const images = await s3Service.uploadFiles(files, _id, 'posts');
       const newPost = new Post({
         description,
         images,
         postType,
         userId: _id,
-        type,
-        uid,
-        likes,
       });
 
       await newPost.save();
-      res.status(201).json({ message: 'Post created successfully', data: newUser });
+      res.status(201).json({ message: 'Post created successfully', data: newPost });
     } else {
       res.status(404).json({ message: 'Post not found' });
     }
@@ -36,6 +35,7 @@ async function createPost(req, res, next) {
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
 
@@ -73,19 +73,115 @@ async function updatePost(req, res, next) {
   session.startTransaction();
 
   try {
-    const { description, images, postType, type, likes, postId } = req.body;
+    const { description, postType, likes, postId } = req.body;
     const post = Post.findOne({ postId });
     if (post) {
       const { files } = req;
-      images = await s3Service.uploadFiles(files, uid, 'posts');
-      const newPost = new Post({
-        description,
-        images: [images],
-        postType,
-        type,
-        likes,
-      });
-      res.status(201).json({ message: 'Post created successfully', data: newUser });
+
+      const images = await s3Service.uploadFiles(files, postId, 'posts');
+      const updatePost = await Post.findOneAndUpdate(
+        { postId },
+        { description, images, postType, likes },
+        { new: true },
+      );
+      res.status(201).json({ message: 'Post updated successfully', data: updatePost });
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+async function getAllPost(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const posts = await Post.find({});
+    res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+async function getNewsPost(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const posts = await Post.find({ postType: 'news' });
+    res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+async function getDisscusionPost(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const posts = await Post.find({ postType: 'disscusion' });
+    res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+async function getJobPost(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const posts = await Post.find({ postType: 'project' });
+    res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+async function getPostByPostId(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const { postId } = req.body;
+
+    const post = await Post.findOne({ postId });
+    if (post) {
+      res.status(200).json({ message: 'Post fetched successfully', data: post });
     } else {
       res.status(404).json({ message: 'Post not found' });
     }
@@ -100,4 +196,13 @@ async function updatePost(req, res, next) {
   }
 }
 
-export default { createPost, deletePostByPostId, updatePost };
+export default {
+  createPost,
+  deletePostByPostId,
+  updatePost,
+  getAllPost,
+  getNewsPost,
+  getDisscusionPost,
+  getJobPost,
+  getPostByPostId,
+};

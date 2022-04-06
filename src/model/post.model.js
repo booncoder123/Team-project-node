@@ -6,6 +6,7 @@ const Post = new mongoose.Schema(
       type: String,
       lowercase: true,
     },
+
     images: {
       type: Array,
       of: String,
@@ -15,8 +16,9 @@ const Post = new mongoose.Schema(
       enum: ['news', 'disscusion', 'project'],
     },
     userId: {
-      type: mongoose.Types.ObjectId,
-      default: '',
+      type: String,
+      required: true,
+      unique: false,
     },
     likes: {
       type: Number,

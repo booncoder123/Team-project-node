@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 import User from '../model/user.model.js';
+import s3Service from '../services/s3.service.js';
 
 async function createUser(req, res, next) {
   const session = await User.startSession();
   session.startTransaction();
 
   try {
-    const { firstName, lastName, email, uid } = req.body;
-    const { file } = req;
-    console.log(file);
+    const { firstName, lastName, username } = req.body;
+    const { uid, file, email } = req;
 
     //! check if user already exists
     const user = await User.findOne({ email });
@@ -18,12 +18,13 @@ async function createUser(req, res, next) {
       });
     }
 
-    //* create new user
+    // //* create new user
     const newUser = new User({
       firstName,
       lastName,
       email,
       uid,
+      username,
     });
 
     await newUser.save();
@@ -32,6 +33,7 @@ async function createUser(req, res, next) {
 
     res.status(201).json({ message: 'User created successfully', data: newUser });
   } catch (error) {
+    console.log('error', error);
     await session.commitTransaction();
     session.endSession();
 
@@ -44,7 +46,7 @@ async function getUserDetail(req, res, next) {
   session.startTransaction();
 
   try {
-    const { uid } = req.body;
+    const { uid } = req;
 
     const user = await User.findOne({ uid });
     if (user) {
@@ -70,12 +72,20 @@ async function updateUserDetail(req, res, next) {
   session.startTransaction();
 
   try {
-    const { uid } = req.body;
-    const { firstName, lastName, email, photoURL } = req.body;
+    const { uid, file } = req;
+    const { firstName, lastName } = req.body;
+    console.log('files', file);
     const user = await User.findOne({ uid });
 
     if (user) {
-      const updatedUser = await User.findOneAndUpdate({ uid }, { firstName, lastName, email, photoURL }, { new: true });
+      const { _id } = user;
+      const imagePath = await s3Service.uploadFiles([file], _id, 'user');
+      console.log(file);
+      const updatedUser = await User.findOneAndUpdate(
+        { uid },
+        { firstName, lastName, photoURL: imagePath[0] },
+        { new: true },
+      );
       res.status(200).json({ message: 'User update successfully', data: updatedUser });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -84,6 +94,7 @@ async function updateUserDetail(req, res, next) {
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
 
@@ -96,8 +107,9 @@ async function deleteUser(req, res, next) {
   session.startTransaction();
 
   try {
-    const { uid } = req.body;
-    const { firstName, lastName, email, photoURL } = req.body;
+    const { uid } = req;
+    console.log(uid);
+
     const user = await User.findOne({ uid });
 
     if (user) {
@@ -164,4 +176,41 @@ async function getUserById(req, res, next) {
   }
 }
 
-export default { createUser, getUserDetail, updateUserDetail, deleteUser, getAllUsers, getUserById };
+async function updateUserProfileImage(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const { uid } = req.body;
+    const { file } = req;
+
+    const user = await User.findOne({ uid });
+
+    if (user) {
+      const { _id } = user;
+      const imagePath = await s3.uploadFiles([file], _id, 'user');
+      const updatedUser = await User.findOneAndUpdate({ _id }, { photoURL: imagePath[0] }, { new: true });
+      res.status(200).json({ message: 'User update image profile successfully', data: updatedUser });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
+export default {
+  createUser,
+  getUserDetail,
+  updateUserDetail,
+  deleteUser,
+  getAllUsers,
+  getUserById,
+  updateUserProfileImage,
+};

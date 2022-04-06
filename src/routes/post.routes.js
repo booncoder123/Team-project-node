@@ -12,8 +12,24 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-router.post('/create-post', multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.createPost);
-router.post('/update-post', multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.updatePost);
+router.post(
+  '/create-post',
+  authMiddleware,
+  multer({ dest: 'temp/', fileFilter }).array('images', 10),
+  PostService.createPost,
+);
+router.post(
+  '/update-post',
+  authMiddleware,
+  multer({ dest: 'temp/', fileFilter }).array('images', 10),
+  PostService.updatePost,
+);
 router.delete('/delete-post', PostService.deletePostByPostId);
+// router.get('/get-post-by-post-id', PostService.getPostByPostId);
+router.get('/get-all-post', authMiddleware, PostService.getAllPost);
+router.get('/get-news-post', authMiddleware, PostService.getNewsPost);
+router.get('/get-disscusion-post', authMiddleware, PostService.getDisscusionPost);
+router.get('/get-job-post', authMiddleware, PostService.getJobPost);
+router.get('/get-post-by-post-id', PostService.getPostByPostId);
 
 export default router;

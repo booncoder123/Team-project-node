@@ -39,6 +39,7 @@ async function startServer() {
     })
     .on('error', err => {
       console.log('error help');
+      console.log(err);
       res.status(200).send(err);
       // process.exit(1);
     });

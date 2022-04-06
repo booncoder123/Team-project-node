@@ -7,16 +7,19 @@ import config from '../config/index.js';
 // const filename = fileURLToPath(import.meta.url);
 // const dirname = path.dirname(filename);
 
-const s3 = new aws.S3();
+let s3 = new aws.S3();
 // const fsPromises = fs.promises;
 
 async function uploadFiles(images, userId, pathS3) {
   try {
-    const fileReturn = await Promise.all(
+    let fileReturn = await Promise.all(
       images.map(async item => {
-        const filePath = path.join(__dirname, '..', '..', 'temp', item.filename);
-        const key = `${pathS3}/${userId}/${item.filename}${uuidv4()}.jpeg`;
-        const params = {
+        let dir = path.resolve();
+        console.log('Dir!', dir);
+
+        let filePath = path.join(dir, 'temp', item.filename);
+        let key = `${pathS3}/${userId}/${item.filename}${uuidv4()}.jpeg`;
+        let params = {
           Bucket: config.aws.bucketName,
           Key: key,
           Body: fs.createReadStream(filePath),
@@ -24,7 +27,7 @@ async function uploadFiles(images, userId, pathS3) {
           // ACL: 'public-read',
         };
 
-        const data = await s3
+        let data = await s3
           .upload(params)
           .promise()
           .then(async tempData => {
@@ -42,7 +45,7 @@ async function uploadFiles(images, userId, pathS3) {
   }
 }
 
-const deleteFiles = async Key => {
+let deleteFiles = async Key => {
   let keyArray = Key;
   if (!Array.isArray(Key)) {
     keyArray = Array.from(keyArray);
@@ -50,7 +53,7 @@ const deleteFiles = async Key => {
   try {
     await Promise.all(
       keyArray.map(async item => {
-        const params = {
+        let params = {
           Bucket: config.aws.bucketName,
           Key: item,
         };
