@@ -5,8 +5,11 @@ import ErrorHandler from './middlewares/ErrorHandler.js';
 import connectMongo from './loaders/mongoose.js';
 import multer from 'multer';
 import userRoute from './routes/user.routes.js';
+import cors from 'cors';
+
 async function startServer() {
   const app = express();
+  app.use(cors());
   await connectMongo();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
