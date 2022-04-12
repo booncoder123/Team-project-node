@@ -123,7 +123,24 @@ async function getNewsPost(req, res, next) {
   session.startTransaction();
 
   try {
-    const posts = await Post.find({ postType: 'news' });
+    const posts = await Post.aggregate([
+      {
+        '$lookup': {
+          'from': 'users', 
+          'localField': 'userId', 
+          'foreignField': '_id', 
+          'as': 'user'
+        }
+      }, {
+        '$unwind': {
+          'path': '$user'
+        }
+      }, {
+        '$match': {
+          'postType': 'news'
+        }
+      }
+    ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
     await session.commitTransaction();
@@ -141,7 +158,24 @@ async function getDisscusionPost(req, res, next) {
   session.startTransaction();
 
   try {
-    const posts = await Post.find({ postType: 'disscusion' });
+    const posts = await Post.aggregate([
+      {
+        '$lookup': {
+          'from': 'users', 
+          'localField': 'userId', 
+          'foreignField': '_id', 
+          'as': 'user'
+        }
+      }, {
+        '$unwind': {
+          'path': '$user'
+        }
+      }, {
+        '$match': {
+          'postType': 'disscusion'
+        }
+      }
+    ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
     await session.commitTransaction();

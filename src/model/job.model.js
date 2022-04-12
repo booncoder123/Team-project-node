@@ -14,6 +14,10 @@ const Job = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       default: '',
     },
+    postType: {
+      type: String,
+      enum: ['intern', 'part-time', 'full-time'],
+    },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
 );

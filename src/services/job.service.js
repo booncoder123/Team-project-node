@@ -2,27 +2,30 @@ import mongoose from 'mongoose';
 import Post from '../model/post.model.js';
 import User from '../model/user.model.js';
 import Job from '../model/job.model.js';
+import s3Service from '../services/s3.service.js';
 
 async function createJob(req, res, next) {
   const session = await User.startSession();
   session.startTransaction();
 
   try {
-    const { description, images, postType, uid } = req.body;
+    const { description, images, postType } = req.body;
+    const { uid } = req;
     const user = await User.findOne({ uid });
     if (user) {
       const { files } = req;
       const { _id } = user;
 
-      images = await s3Service.uploadFiles(files, _id, 'jobs');
-      const newJob = new Job({
-        description,
-        images,
-        postType,
-        userId: _id,
-      });
+      console.log(files);
+      // const paths = await s3Service.uploadFiles(files, _id, 'jobs');
+      // const newJob = new Job({
+      //   description,
+      //   images: paths,
+      //   postType,
+      //   userId: _id,
+      // });
 
-      await newJob.save();
+      // await newJob.save();
       res.status(201).json({ message: 'Job created successfully', data: newJob });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -31,6 +34,7 @@ async function createJob(req, res, next) {
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
 

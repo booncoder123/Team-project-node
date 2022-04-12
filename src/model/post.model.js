@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
 const Post = new mongoose.Schema(
   {
@@ -16,7 +17,7 @@ const Post = new mongoose.Schema(
       enum: ['news', 'disscusion', 'project'],
     },
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       unique: false,
     },
