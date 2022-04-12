@@ -28,10 +28,11 @@ async function createUser(req, res, next) {
     });
 
     await newUser.save();
-    await session.commitTransaction();
-    session.endSession();
 
     res.status(201).json({ message: 'User created successfully', data: newUser });
+
+    await session.commitTransaction();
+    session.endSession();
   } catch (error) {
     console.log('error', error);
     await session.commitTransaction();
