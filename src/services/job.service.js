@@ -9,23 +9,25 @@ async function createJob(req, res, next) {
   session.startTransaction();
 
   try {
-    const { description, images, postType } = req.body;
+    const { description, companyName, types, title } = req.body;
     const { uid } = req;
     const user = await User.findOne({ uid });
     if (user) {
       const { files } = req;
       const { _id } = user;
+      console.log('types here:', req.body);
 
-      console.log(files);
-      // const paths = await s3Service.uploadFiles(files, _id, 'jobs');
-      // const newJob = new Job({
-      //   description,
-      //   images: paths,
-      //   postType,
-      //   userId: _id,
-      // });
+      const paths = await s3Service.uploadFiles(files, _id, 'jobs');
+      const newJob = new Job({
+        description,
+        companyName,
+        types,
+        title,
+        images: paths,
+        userId: _id,
+      });
 
-      // await newJob.save();
+      await newJob.save();
       res.status(201).json({ message: 'Job created successfully', data: newJob });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -46,22 +48,21 @@ async function updateJobByJobId(req, res, next) {
   session.startTransaction();
 
   try {
-    const { jobId, description, images, postType, uid } = req.body;
-    const user = await User.findOne({ uid });
-    if (user) {
-      const { _id } = user;
-      //! images file from user
+    const { jobId, description, companyName, types, title, logo } = req.body;
+    const job = await Job.findOne({ jobId });
+    if (job) {
       const { files } = req;
-
-      images = await s3Service.uploadFiles(files, _id, 'jobs');
-      const updateJob = await Job.findOneAndUpdate({ jobId }, { description, images, postType }, { new: true });
+      const images = await s3Service.uploadFiles(files ? files : [], jobId, 'jobs');
+      const updateJob = await Job.findOneAndUpdate({ jobId }, { companyName, types, title, images }, { new: true });
       res.status(200).json({ message: 'Job updated successfully', data: updateJob });
-      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.status(404).json({ message: 'Job not found' });
     }
 
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
 

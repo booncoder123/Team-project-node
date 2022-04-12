@@ -20,12 +20,12 @@ router.post(
 );
 router.post(
   '/update-job',
-  authMiddleware,
+
   multer({ dest: 'temp/', fileFilter }).array('images', 10),
   JobService.updateJobByJobId,
 );
 router.delete('/delete-job', authMiddleware, JobService.deleteJobByJobId);
-router.get('/get-all-jobs', authMiddleware, JobService.getAllJobs);
-router.get('/get-job-by-job-id', authMiddleware, JobService.getJobByJobId);
+router.get('/get-all-jobs', JobService.getAllJobs);
+router.get('/get-job-by-job-id', JobService.getJobByJobId);
 
 export default router;
