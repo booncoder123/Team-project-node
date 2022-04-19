@@ -292,6 +292,12 @@ async function putLike(req, res, next) {
           res.status(201).json({ message: 'Post updated successfully(like)', data: updatePost });
         }
       }
+      else{
+        throw new Error('Post not found');
+      }
+    }
+    else{
+      throw new Error('User not found');
     }
 
     await session.commitTransaction();
