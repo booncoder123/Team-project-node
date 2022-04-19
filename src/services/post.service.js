@@ -18,7 +18,7 @@ async function createPost(req, res, next) {
       const { _id } = user;
       //! images file from user
 
-      const images = await s3Service.uploadFiles(files, _id, 'posts');
+      const images = await s3Service.uploadFiles(files.length?[files]:[], _id, 'posts');
       const newPost = new Post({
         description,
         images,
