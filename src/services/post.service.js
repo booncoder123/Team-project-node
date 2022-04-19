@@ -77,8 +77,9 @@ async function updatePost(req, res, next) {
     const post = Post.findOne({ postId });
     if (post) {
       const { files } = req;
-
-      const images = await s3Service.uploadFiles(files, postId, 'posts');
+      
+      
+      const images =  await s3Service.uploadFiles(files, postId, 'posts');
       const updatePost = await Post.findOneAndUpdate(
         { postId },
         { description, images, postType, likes },
@@ -255,6 +256,33 @@ async function getPostByPostId(req, res, next) {
   }
 }
 
+async function putLike(req, res, next) {
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const { postId,likes } = req.body;
+
+
+    const post = await Post.findOne({ postId });
+    if (post) {
+      const updatedPost = await Post.findOneAndUpdate( { postId }, { likes }, { new: true });
+      res.send({ message: 'Post liked successfully', data: updatedPost });
+   
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
 export default {
   createPost,
   deletePostByPostId,
@@ -264,4 +292,5 @@ export default {
   getDisscusionPost,
   getJobPost,
   getPostByPostId,
+  putLike,
 };

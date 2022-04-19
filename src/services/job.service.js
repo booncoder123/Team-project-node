@@ -13,10 +13,12 @@ async function createJob(req, res, next) {
     const { uid } = req;
     const user = await User.findOne({ uid });
     if (user) {
-      const { files } = req;
+      const { files ,file} = req;
       const { _id } = user;
       // console.log(req);
-      console.log(req)
+      console.log(file)
+      console.log(files)
+      console.log(req);
 
       // const paths = await s3Service.uploadFiles(files, _id, 'jobs');
       // const newJob = new Job({

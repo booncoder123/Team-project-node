@@ -15,7 +15,7 @@ const fileFilter = (req, file, cb) => {
 router.post(
   '/create-job',
   authMiddleware,
-  multer({ dest: 'temp/', fileFilter }).array('images', 10),
+  multer({ dest: 'temp/', fileFilter }).single('images', 1),
   JobService.createJob,
 );
 router.post(

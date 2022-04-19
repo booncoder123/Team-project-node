@@ -26,10 +26,11 @@ router.post(
 );
 router.delete('/delete-post', PostService.deletePostByPostId);
 // router.get('/get-post-by-post-id', PostService.getPostByPostId);
-router.get('/get-all-post', authMiddleware, PostService.getAllPost);
+router.get('/get-all-post', PostService.getAllPost);
 router.get('/get-news-post', PostService.getNewsPost);
 router.get('/get-disscusion-post', PostService.getDisscusionPost);
 router.get('/get-job-post', authMiddleware, PostService.getJobPost);
 router.get('/get-post-by-post-id', PostService.getPostByPostId);
+router.put('/like', PostService.putLike);
 
 export default router;
