@@ -15,23 +15,22 @@ async function createJob(req, res, next) {
     if (user) {
       const { files ,file} = req;
       const { _id } = user;
-      // console.log(req);
-      console.log(file)
       console.log(files)
-      console.log(req);
+  
 
-      // const paths = await s3Service.uploadFiles(files, _id, 'jobs');
-      // const newJob = new Job({
-      //   description,
-      //   companyName,
-      //   types,
-      //   title,
-      //   images: paths,
-      //   userId: _id,
-      // });
 
-      // await newJob.save();
-      // res.status(201).json({ message: 'Job created successfully', data: newJob });
+      const paths = await s3Service.uploadFiles(files, _id, 'jobs');
+      const newJob = new Job({
+        description, 
+        companyName,
+        types,
+        title,
+        images: paths,
+        userId: _id,
+      });
+
+      await newJob.save();
+      res.status(201).json({ message: 'Job created successfully', data: newJob });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
