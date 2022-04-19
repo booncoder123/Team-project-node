@@ -134,6 +134,17 @@ async function getNewsPost(req, res, next) {
   try {
     const posts = await Post.aggregate([
       {
+        '$match': {
+          'postType': 'news'
+        }
+      }, {
+        '$lookup': {
+          'from': 'comments', 
+          'localField': '_id', 
+          'foreignField': 'postId', 
+          'as': 'comments'
+        }
+      }, {
         '$lookup': {
           'from': 'users', 
           'localField': 'userId', 
@@ -142,11 +153,8 @@ async function getNewsPost(req, res, next) {
         }
       }, {
         '$unwind': {
-          'path': '$user'
-        }
-      }, {
-        '$match': {
-          'postType': 'news'
+          'path': '$user', 
+          'preserveNullAndEmptyArrays': true
         }
       }
     ]);
@@ -169,6 +177,17 @@ async function getDisscusionPost(req, res, next) {
   try {
     const posts = await Post.aggregate([
       {
+        '$match': {
+          'postType': 'disscusion'
+        }
+      }, {
+        '$lookup': {
+          'from': 'comments', 
+          'localField': '_id', 
+          'foreignField': 'postId', 
+          'as': 'comments'
+        }
+      }, {
         '$lookup': {
           'from': 'users', 
           'localField': 'userId', 
@@ -177,11 +196,8 @@ async function getDisscusionPost(req, res, next) {
         }
       }, {
         '$unwind': {
-          'path': '$user'
-        }
-      }, {
-        '$match': {
-          'postType': 'disscusion'
+          'path': '$user', 
+          'preserveNullAndEmptyArrays': true
         }
       }
     ]);
