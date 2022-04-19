@@ -10,6 +10,11 @@ const Comment = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       default: '',
     },
+    userId: {
+      type: mongoose.Types.ObjectId,
+      userId: '',
+      require: true
+    },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
 );

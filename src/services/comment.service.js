@@ -9,19 +9,24 @@ async function createComment(req, res, next) {
   session.startTransaction();
 
   try {
+    const {uid} = req;
     const { content, postId } = req.body;
     const post = await Post.findOne({ postId });
-    if (post) {
-      const { _id } = post;
+    const user = await User.findOne({ uid });
+
+    if (post && user) {
+      const { _id : postId } = post;
+      const {_id : userId} = user;
       const newComment = new Comment({
         content,
-        postId: _id,
+        postId,
+        userId,
       });
 
       await newComment.save();
       res.status(201).json({ message: 'Comment created successfully', data: newComment });
     } else {
-      res.status(404).json({ message: 'Comment not found' });
+      res.status(404).json({ message: 'post not found' });
     }
 
     await session.commitTransaction();
@@ -66,10 +71,8 @@ async function getAllCommentsByPostId(req, res, next) {
   try {
     const { postId } = req.body;
     console.log(postId);
-    const comments = await Comment.find({ postId: mongoose.Types.ObjectId(postId) })
-      .sort({ date: 1 })
-      .exec();
-    if (comments) {
+    const comments = await Comment.find({ postId }).sort({ date: 1 }).exec();
+    if (comments.length) {
       res.status(200).json({ message: 'Comments found successfully', data: comments });
     } else {
       res.status(404).json({ message: 'Comments not found' });

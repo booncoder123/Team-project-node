@@ -13,6 +13,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 router.get('/get-job-description-by-job-post-id', JobDescriptionService.getJobDescriptionByPostId);
-router.get('/post-job-description', JobDescriptionService.postJobDescription);
+router.post('/', JobDescriptionService.postJobDescription);
 router.post('/update-job-description', JobDescriptionService.updateJobDescription);
 router.delete('/delete-job-description', JobDescriptionService.deleteJobDescription);
+export default router;

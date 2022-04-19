@@ -15,7 +15,6 @@ async function createJob(req, res, next) {
     if (user) {
       const { files } = req;
       const { _id } = user;
-      console.log('types here:', req.body);
 
       const paths = await s3Service.uploadFiles(files, _id, 'jobs');
       const newJob = new Job({

@@ -25,7 +25,7 @@ async function postProjectDescriptionByPostId(req, res, next) {
         await newProjectDescription.save();
         res.status(201).json({ message: 'Project description created successfully', data: newProjectDescription });
       } else {
-        res.status(404).json({ message: 'Project is not project' });
+        res.status(404).json({ message: 'type is not project' });
       }
     } else {
       res.status(404).json({ message: 'Post not found' });
