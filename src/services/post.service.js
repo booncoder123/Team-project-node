@@ -18,7 +18,7 @@ async function createPost(req, res, next) {
       const { _id } = user;
       //! images file from user
 
-      const images = await s3Service.uploadFiles(files.length?[files]:[], _id, 'posts');
+      const images = await s3Service.uploadFiles(files.length ? [files] : [], _id, 'posts');
       const newPost = new Post({
         description,
         images,
@@ -77,9 +77,8 @@ async function updatePost(req, res, next) {
     const post = Post.findOne({ postId });
     if (post) {
       const { files } = req;
-      
-      
-      const images =  await s3Service.uploadFiles(files, postId, 'posts');
+
+      const images = await s3Service.uploadFiles(files, postId, 'posts');
       const updatePost = await Post.findOneAndUpdate(
         { postId },
         { description, images, postType, likes },
@@ -108,13 +107,13 @@ async function getAllPost(req, res, next) {
   try {
     const posts = await Post.aggregate([
       {
-        '$lookup': {
-          'from': 'comments', 
-          'localField': '_id', 
-          'foreignField': 'postId', 
-          'as': 'comments'
-        }
-      }
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'comments',
+        },
+      },
     ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
@@ -135,29 +134,32 @@ async function getNewsPost(req, res, next) {
   try {
     const posts = await Post.aggregate([
       {
-        '$match': {
-          'postType': 'news'
-        }
-      }, {
-        '$lookup': {
-          'from': 'comments', 
-          'localField': '_id', 
-          'foreignField': 'postId', 
-          'as': 'comments'
-        }
-      }, {
-        '$lookup': {
-          'from': 'users', 
-          'localField': 'userId', 
-          'foreignField': '_id', 
-          'as': 'user'
-        }
-      }, {
-        '$unwind': {
-          'path': '$user', 
-          'preserveNullAndEmptyArrays': true
-        }
-      }
+        $match: {
+          postType: 'news',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
     ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
@@ -178,29 +180,32 @@ async function getDisscusionPost(req, res, next) {
   try {
     const posts = await Post.aggregate([
       {
-        '$match': {
-          'postType': 'disscusion'
-        }
-      }, {
-        '$lookup': {
-          'from': 'comments', 
-          'localField': '_id', 
-          'foreignField': 'postId', 
-          'as': 'comments'
-        }
-      }, {
-        '$lookup': {
-          'from': 'users', 
-          'localField': 'userId', 
-          'foreignField': '_id', 
-          'as': 'user'
-        }
-      }, {
-        '$unwind': {
-          'path': '$user', 
-          'preserveNullAndEmptyArrays': true
-        }
-      }
+        $match: {
+          postType: 'disscusion',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
     ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
@@ -259,28 +264,42 @@ async function getPostByPostId(req, res, next) {
 async function putLike(req, res, next) {
   const session = await Post.startSession();
   session.startTransaction();
-
   try {
-    const { postId,likes } = req.body;
+    const { postId } = req.body;
+    const { uid } = req;
+    const user = await User.findOne({ uid });
 
-
-    const post = await Post.findOne({ postId });
-    if (post) {
+    if (user) {
+      const post = await Post.findOne({ postId });
+      if (post) {
+        const { likers } = post;
+        console.log(likers);
       
-  
-      const updatedPost = await Post.findOneAndUpdate( { _id:postId }, { likes }, { new: true });
-      res.send({ message: 'Post liked successfully', data: updatedPost });
-   
-    } else {
-      res.status(404).json({ message: 'Post not found' });
+        const { _id } = user;
+        console.log(_id);
+        console.log(likers.includes(mongoose.Types.ObjectId(_id)));
+        if (likers.includes(_id)) {
+          // const likers = post.likers.filter(liker => liker !== _id);
+          const updatePost = await Post.findOneAndUpdate({ postId }, { $pull: { likers: _id } }, { new: true });
+          res.status(201).json({ message: 'Post updated successfully(unlike)', data: updatePost });
+        } 
+        else {
+          const updatePost = await Post.findOneAndUpdate(
+            { postId },
+            { $push: { likers: mongoose.Types.ObjectId(_id) } },
+            { new: true },
+          );
+          res.status(201).json({ message: 'Post updated successfully(like)', data: updatePost });
+        }
+      }
     }
 
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
-
     next(error);
   }
 }

@@ -21,10 +21,11 @@ const Post = new mongoose.Schema(
       required: true,
       unique: false,
     },
-    likes: {
-      type: Number,
-      default: 0,
-    },
+    likers : {
+      type: Array,
+      of: Schema.Types.ObjectId,
+    }
+   
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
 );

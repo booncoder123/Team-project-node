@@ -31,6 +31,7 @@ router.get('/get-news-post', PostService.getNewsPost);
 router.get('/get-disscusion-post', PostService.getDisscusionPost);
 router.get('/get-job-post', authMiddleware, PostService.getJobPost);
 router.get('/get-post-by-post-id', PostService.getPostByPostId);
-router.put('/like', PostService.putLike);
+router.put('/like',authMiddleware, PostService.putLike);
+
 
 export default router;
