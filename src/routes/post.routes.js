@@ -1,4 +1,5 @@
 import express from 'express';
+// import { auth } from 'firebase-admin';
 import multer from 'multer';
 import authMiddleware from '../middlewares/Auth.middleware.js';
 import PostService from '../services/post.service.js';
@@ -32,6 +33,13 @@ router.get('/get-disscusion-post', PostService.getDisscusionPost);
 router.get('/get-job-post', authMiddleware, PostService.getJobPost);
 router.get('/get-post-by-post-id', PostService.getPostByPostId);
 router.put('/like',authMiddleware, PostService.putLike);
+
+router.post("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.createProject);
+router.get("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.getAllProjects);
+router.put("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.updateProject);
+router.delete("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.deleteProject);
+
+
 
 
 export default router;
