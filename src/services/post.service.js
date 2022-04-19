@@ -266,7 +266,9 @@ async function putLike(req, res, next) {
 
     const post = await Post.findOne({ postId });
     if (post) {
-      const updatedPost = await Post.findOneAndUpdate( { postId }, { likes }, { new: true });
+      
+  
+      const updatedPost = await Post.findOneAndUpdate( { _id:postId }, { likes }, { new: true });
       res.send({ message: 'Post liked successfully', data: updatedPost });
    
     } else {
