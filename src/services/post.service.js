@@ -105,7 +105,16 @@ async function getAllPost(req, res, next) {
   session.startTransaction();
 
   try {
-    const posts = await Post.find({});
+    const posts = await Post.aggregate([
+      {
+        '$lookup': {
+          'from': 'comments', 
+          'localField': '_id', 
+          'foreignField': 'postId', 
+          'as': 'comments'
+        }
+      }
+    ]);
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
     await session.commitTransaction();
