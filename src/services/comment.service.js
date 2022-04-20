@@ -9,29 +9,53 @@ async function createComment(req, res, next) {
   session.startTransaction();
 
   try {
+  
     const {uid} = req;
     const { content, postId } = req.body;
-    const post = await Post.findOne({ postId });
+    // const post = await Post.findOne({ postId });
     const user = await User.findOne({ uid });
+    const { _id } = user;
 
-    if (post && user) {
-      const { _id : postId } = post;
-      const {_id : userId} = user;
+   console.log("Post Id",postId)
+
+
       const newComment = new Comment({
         content,
         postId,
-        userId,
+        userId:_id,
       });
 
-      await newComment.save();
-      res.status(201).json({ message: 'Comment created successfully', data: newComment });
-    } else {
-      res.status(404).json({ message: 'post not found' });
-    }
+    const  updatedComment =  await newComment.save();
+     const { _id: commentId } = updatedComment;
+
+      const comment = await Comment.aggregate([
+        {
+          '$match': {
+            '_id': commentId
+          }
+        }, {
+          '$lookup': {
+            'from': 'users', 
+            'localField': 'userId', 
+            'foreignField': '_id', 
+            'as': 'user'
+          }
+        }, {
+          '$unwind': {
+            'path': '$user', 
+            'preserveNullAndEmptyArrays': true
+          }
+        }
+      ]);
+
+
+      res.status(201).json({ message: 'Comment created successfully', data: comment });
+   
 
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
+    console.log(error);
     await session.commitTransaction();
     session.endSession();
 
@@ -69,13 +93,34 @@ async function getAllCommentsByPostId(req, res, next) {
   session.startTransaction();
 
   try {
+    console.log("eiei")
     const { postId } = req.body;
     console.log(postId);
-    const comments = await Comment.find({ postId }).sort({ date: 1 }).exec();
+    const comments = await Comment.aggregate([
+      {
+        '$lookup': {
+          'from': 'users', 
+          'localField': 'userId', 
+          'foreignField': '_id', 
+          'as': 'user'
+        }
+      }, {
+        '$unwind': {
+          'path': '$user', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$match': {
+          'postId': mongoose.Types.ObjectId(postId)
+        }
+      }
+    ]).sort({ date: 1 }).exec();
+
+    console.log(comments);
     if (comments.length) {
       res.status(200).json({ message: 'Comments found successfully', data: comments });
     } else {
-      res.status(404).json({ message: 'Comments not found' });
+      res.status(404).json({ message: 'Comments not found',data: [] });
     }
 
     await session.commitTransaction();

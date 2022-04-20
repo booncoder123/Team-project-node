@@ -8,12 +8,16 @@ const Comment = new mongoose.Schema(
     },
     postId: {
       type: mongoose.Types.ObjectId,
-      default: '',
+   
+      require: true,
+      unique: false,
+      
     },
     userId: {
       type: mongoose.Types.ObjectId,
-      userId: '',
-      require: true
+  require: true,
+      unique: false,
+   
     },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
