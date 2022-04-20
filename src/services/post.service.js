@@ -473,6 +473,73 @@ async function deleteProject(req, res, next) {
   }
 }
 
+async function getProjectById(req, res, next) {
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const { projectId } = req.body;
+    console.log(projectId);
+    const post = await Post.aggregate([
+      {
+        '$match': {
+          '_id': mongoose.Types.ObjectId(projectId)
+        }
+      }, {
+        '$lookup': {
+          'from': 'projectdescriptions', 
+          'localField': '_id', 
+          'foreignField': 'postId', 
+          'as': 'project'
+        }
+      }, {
+        '$unwind': {
+          'path': '$post', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'users', 
+          'localField': 'userId', 
+          'foreignField': '_id', 
+          'as': 'user'
+        }
+      }, {
+        '$unwind': {
+          'path': '$user', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'comments', 
+          'localField': 'postId', 
+          'foreignField': '_id', 
+          'as': 'comments'
+        }
+      }, {
+        '$unwind': {
+          'path': '$comments', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }
+    ]);
+    res.status(200).json({ message: 'Post fetched successfully', data: post });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+
+
+
+
+
+
 export default {
   createPost,
   deletePostByPostId,
@@ -486,5 +553,6 @@ export default {
   createProject,
   getAllProjects,
   updateProject,
-  deleteProject
+  deleteProject,
+  getProjectById
 };

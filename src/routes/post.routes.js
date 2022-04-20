@@ -38,6 +38,7 @@ router.post("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).arr
 router.get("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.getAllProjects);
 router.put("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.updateProject);
 router.delete("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.deleteProject);
+router.get("/project/projectId",  PostService.getProjectById);
 
 
 
