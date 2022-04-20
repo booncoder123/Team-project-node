@@ -19,7 +19,7 @@ async function createPost(req, res, next) {
       const { _id } = user;
       //! images file from user
 
-      const images = await s3Service.uploadFiles(files.length ? [files] : [], _id, 'posts');
+      const images = await s3Service.uploadFiles(files, _id, 'posts');
       const newPost = new Post({
         description,
         images,
@@ -271,23 +271,24 @@ async function putLike(req, res, next) {
     const user = await User.findOne({ uid });
 
     if (user) {
-      const post = await Post.findOne({ postId });
+      const post = await Post.findOne({ _id :postId });
       if (post) {
         const { likers } = post;
         console.log(likers);
       
-        const { _id } = user;
-        console.log(_id);
-        console.log(likers.includes(mongoose.Types.ObjectId(_id)));
-        if (likers.includes(_id)) {
+        const { _id  : userId} = user;
+        
+
+        if (likers.includes(userId)) {
           // const likers = post.likers.filter(liker => liker !== _id);
-          const updatePost = await Post.findOneAndUpdate({ postId }, { $pull: { likers: _id } }, { new: true });
+          const updatePost = await Post.findOneAndUpdate({ _id:postId }, { $pull: {  likers: mongoose.Types.ObjectId(userId)  } }, { new: true });
+         
           res.status(201).json({ message: 'Post updated successfully(unlike)', data: updatePost });
         } 
         else {
           const updatePost = await Post.findOneAndUpdate(
-            { postId },
-            { $push: { likers: mongoose.Types.ObjectId(_id) } },
+            {  _id:postId },
+            { $push: { likers: mongoose.Types.ObjectId(userId) } },
             { new: true },
           );
           res.status(201).json({ message: 'Post updated successfully(like)', data: updatePost });
