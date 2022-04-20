@@ -26,7 +26,7 @@ const ProjectDescription = new mongoose.Schema(
     },
     year: {
      type : [Number],
-     enum: ["1","2","3","4"],
+     enum: [1,2,3,4],
     },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
