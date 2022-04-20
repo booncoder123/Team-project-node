@@ -122,7 +122,7 @@ async function getJobByJobId(req, res, next) {
   try {
     const { jobId } = req.body;
     console.log(jobId);
-    const job = await Job.findById( jobId );
+    const job = await Job.findOne({_id : jobId});
     if (job) {
       res.status(200).json({ message: 'Job fetched successfully', data: job });
     } else {
