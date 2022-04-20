@@ -244,8 +244,10 @@ async function getPostByPostId(req, res, next) {
 
   try {
     const { postId } = req.body;
+    console.log(postId);
 
-    const post = await Post.findOne({ postId });
+    const post = await Post.findOne({ _id:postId });
+    
     if (post) {
       res.status(200).json({ message: 'Post fetched successfully', data: post });
     } else {
