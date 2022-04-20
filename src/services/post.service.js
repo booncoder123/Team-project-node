@@ -326,9 +326,9 @@ async function createProject(req, res, next) {
       const { name,intro,type,year,description} = req.body;
       const { files } = req;
 
-console.log(description);
-      const images = await s3Service.uploadFiles(files, _id, 'posts');
-      const newPost = new Post({
+
+      const images = await s3Service.uploadFiles(files, _id, 'project');
+      const newPost = await new Post({
         images,
         postType : "project",
         userId : _id
@@ -336,7 +336,7 @@ console.log(description);
       await newPost.save();
       console.log(newPost);
 
-      const projeectDescription = new ProjectDescription({
+      const projeectDescription = await new ProjectDescription({
         name,
         intro,
         type,
