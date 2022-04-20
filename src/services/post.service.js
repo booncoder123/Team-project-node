@@ -317,7 +317,6 @@ async function putLike(req, res, next) {
 async function createProject(req, res, next) {
   const session = await Post.startSession();
   session.startTransaction();
-  console.log("ei")
 
   try {
     const { uid } = req;
@@ -327,7 +326,7 @@ async function createProject(req, res, next) {
       const { name,intro,type,year,description} = req.body;
       const { files } = req;
 
-
+console.log(description);
       const images = await s3Service.uploadFiles(files, _id, 'posts');
       const newPost = new Post({
         images,
@@ -335,25 +334,27 @@ async function createProject(req, res, next) {
         userId : _id
       });
       await newPost.save();
+      console.log(newPost);
 
       const projeectDescription = new ProjectDescription({
         name,
         intro,
         type,
         year,
-        description,
+        projectDescription: description,
         postId: newPost._id,
       });
+      
 
       await projeectDescription.save();
-   
+      res.status(201).json({ message: 'Project created successfully', newPost,projeectDescription });
 
 
     }
 
     await session.commitTransaction();
     session.endSession();
-    res.status(201).json({ message: 'Project created successfully', data: newPost });
+   
   } catch (error) {
     console.log(error);
     await session.commitTransaction();

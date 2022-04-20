@@ -35,7 +35,7 @@ router.get('/get-post-by-post-id', PostService.getPostByPostId);
 router.put('/like',authMiddleware, PostService.putLike);
 
 router.post("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.createProject);
-router.get("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.getAllProjects);
+router.get("/project", multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.getAllProjects);
 router.put("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.updateProject);
 router.delete("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.deleteProject);
 router.get("/project/projectId",  PostService.getProjectById);
