@@ -73,18 +73,19 @@ async function updateUserDetail(req, res, next) {
   session.startTransaction();
 
   try {
-    const { uid, file } = req;
-    const { firstName, lastName } = req.body;
-    console.log('files', file);
+    const { uid, files } = req;
+    const { firstName, lastName,username } = req.body;
+   
+
     const user = await User.findOne({ uid });
 
     if (user) {
       const { _id } = user;
-      const imagePath = await s3Service.uploadFiles([file], _id, 'user');
-      console.log(file);
+      const imagePath = await s3Service.uploadFiles(files.length ? files : [], _id, 'user');
+
       const updatedUser = await User.findOneAndUpdate(
         { uid },
-        { firstName, lastName, photoURL: imagePath[0] },
+        { firstName, lastName, username,photoURL: imagePath[0] },
         { new: true },
       );
       res.status(200).json({ message: 'User update successfully', data: updatedUser });
@@ -206,6 +207,30 @@ async function updateUserProfileImage(req, res, next) {
   }
 }
 
+async function getUserByUid(req, res, next) {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const { uid } = req;
+    const user = await User.findOne({ uid });
+
+    if (user) {
+      res.status(200).json({ message: 'User found successfully', data: user });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+}
+
 export default {
   createUser,
   getUserDetail,
@@ -214,4 +239,5 @@ export default {
   getAllUsers,
   getUserById,
   updateUserProfileImage,
+  getUserByUid
 };

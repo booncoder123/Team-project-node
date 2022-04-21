@@ -13,13 +13,14 @@ const fileFilter = (req, file, cb) => {
 
 const router = express.Router();
 router.get('/users', UserService.getAllUsers);
+router.get('/uid',authMiddleware, UserService.getUserByUid);
 router.get('/get-user-detail', authMiddleware, UserService.getUserDetail);
 router.get('/get-user-by-id', authMiddleware, UserService.getUserById);
 router.post('/create-user', authMiddleware, UserService.createUser);
 router.post(
   '/update-user-detail',
   authMiddleware,
-  multer({ dest: 'temp/', fileFilter }).single('image'),
+  multer({ dest: 'temp/', fileFilter }).array('images', 10),
   UserService.updateUserDetail,
 );
 router.delete('/delete-user', authMiddleware, UserService.deleteUser);
