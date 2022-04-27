@@ -12,7 +12,7 @@ const JobDescription = new mongoose.Schema(
     },
     type: {
       type: [String],
-      enum: ['intern', 'full-time', 'past-time'],
+      enum: ['intern', 'full-time', 'past-time','ta'],
     },
     description: {
       type: String,

@@ -14,7 +14,7 @@ const Post = new mongoose.Schema(
     },
     postType: {
       type: String,
-      enum: ['news', 'disscusion', 'project'],
+      enum: ['news', 'discussion', 'project'],
     },
     userId: {
       type: Schema.Types.ObjectId,

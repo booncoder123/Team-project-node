@@ -182,7 +182,7 @@ async function getDisscusionPost(req, res, next) {
     const posts = await Post.aggregate([
       {
         $match: {
-          postType: 'disscusion',
+          postType: 'discussion',
         },
       },
       {
@@ -442,34 +442,33 @@ async function updateProject(req, res, next) {
   }
 }
 
-async function deleteProject(req, res, next) {
+async function  deleteProject(req, res, next) {
   const session = await Post.startSession();
   session.startTransaction();
 
   try {
     const { postId } = req.body;
     const { uid } = req;
-    const user = await User.findOne({ uid });
-    if (user) {
-      const post = await Post.findOne({ postId });
-      if (post) {
-        await post.remove();
-        res.status(200).json({ message: 'Post deleted successfully' });
-      }
-      else{
-        throw new Error('Post not found');
-      }
-    }
-    else{
-      throw new Error('User not found');
-    }
+    const user = await User.findOne({ uid:uid });
 
+const isPostExist = await Post.findOne({ _id  : postId });
+if(isPostExist){
+  const deletedPost = await Post.findOneAndDelete({ _id:postId });
+  const deletedProject = await ProjectDescription.findOneAndDelete({ postId:postId });  
+  res.status(201).json({ message: 'Post deleted successfully', deletedPost:{
+    deletedPost,deletedProject
+  } });
+}
+ 
+else{
+  throw new Error('Post not found');
+}
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
     console.log(error);
-    await session.commitTransaction();
     session.endSession();
+    await session.abortTransaction();
     next(error);
   }
 }
@@ -536,6 +535,187 @@ async function getProjectById(req, res, next) {
   }
 }
 
+async function getDisscusionPostByUid(req,res,next){
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const { uid } = req;
+    const user = await User.findOne({ uid });
+    if (user) {
+      console.log(user);
+      const posts = await Post.aggregate([
+        {
+          '$match': {
+            'userId': user._id,
+            'postType': 'discussion'
+          }
+        }, {
+          '$lookup': {
+            'from': 'comments', 
+            'localField': '_id', 
+            'foreignField': 'postId', 
+            'as': 'comments'
+          }
+        }, {
+          '$unwind': {
+            'path': '$comments', 
+            'preserveNullAndEmptyArrays': true
+          }
+        }
+      ]);
+      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+      await session.commitTransaction();
+      session.endSession();
+    }
+    else{
+      throw new Error('User not found');
+    }
+
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+async function getAllDiscussion(req,res,next){
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ uid:req.uid });
+    if (user) {
+      const userId = user._id;
+      const posts = await Post.find({ postType: 'discussion' ,userId : userId});
+      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+      await session.commitTransaction();
+      session.endSession();
+    }
+    else{
+      throw new Error('User not found');
+    }
+
+
+    
+    // res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+
+async function getAllNews(req,res,next){
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ uid:req.uid });
+    if (user) {
+
+      const userId = user._id;
+      const posts = await Post.find({ postType: 'news' ,userId : userId});
+
+      
+      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+      await session.commitTransaction();
+      session.endSession();
+    }
+    else{
+      throw new Error('User not found');
+    }
+
+
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+async function getAllJob(req,res,next){
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ uid:req.uid });
+    if (user) {
+      const userId = user._id;
+      const posts = await Post.find({ postType: 'job' ,userId : userId});
+      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+      await session.commitTransaction();
+      session.endSession();
+    }
+    else{
+      throw new Error('User not found');
+    }
+
+
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+
+async function getAllProject (req, res, next) {
+  const session = await Post.startSession();
+  session.startTransaction();
+
+  try {
+    const user = await User.findOne({ uid:req.uid });
+    if (user) {
+      const userId = user._id;
+      const posts = await Post.aggregate([
+        {
+          '$lookup': {
+            'from': 'projectdescriptions', 
+            'localField': '_id', 
+            'foreignField': 'postId', 
+            'as': 'project'
+          }
+        }, {
+          '$unwind': {
+            'path': '$project', 
+            'preserveNullAndEmptyArrays': true
+          }
+        }, {
+          '$match': {
+            'userId': userId
+          }
+        }
+      ]);
+      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
+
+
+      await session.commitTransaction();
+      session.endSession();
+      
+    }
+    else{
+      throw new Error('User not found');
+    }
+
+
+  } catch (error) {
+    console.log(error);
+    await session.commitTransaction();
+    session.endSession();
+    next(error);
+  }
+}
+
+
 
 
 
@@ -555,5 +735,12 @@ export default {
   getAllProjects,
   updateProject,
   deleteProject,
-  getProjectById
+  getProjectById,
+  getDisscusionPostByUid,
+  getAllDiscussion,
+  getAllNews,
+  getAllJob,
+  getAllProject
+
+
 };

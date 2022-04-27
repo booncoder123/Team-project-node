@@ -9,7 +9,7 @@ async function createJob(req, res, next) {
   session.startTransaction();
 
   try {
-    const { description, companyName, types, title } = req.body;
+    const { description, companyName, types, title,applyLink } = req.body;
     const { uid } = req;
     const user = await User.findOne({ uid });
     if (user) {
@@ -27,6 +27,7 @@ async function createJob(req, res, next) {
         title,
         images: paths,
         userId: _id,
+        applyLink
       });
 
       await newJob.save();

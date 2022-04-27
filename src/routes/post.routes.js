@@ -39,6 +39,14 @@ router.get("/project", multer({ dest: 'temp/', fileFilter }).array('images', 10)
 router.put("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.updateProject);
 router.delete("/project",authMiddleware, multer({ dest: 'temp/', fileFilter }).array('images', 10), PostService.deleteProject);
 router.get("/project/projectId",  PostService.getProjectById);
+router.get("/get-disscusion-post-by-uid",authMiddleware, PostService.getDisscusionPostByUid);
+
+
+//uid
+router.get("/discussion",authMiddleware, PostService.getAllDiscussion);
+router.get("/news",authMiddleware, PostService.getAllNews);
+router.get("/job",authMiddleware, PostService.getAllJob);
+router.get("/project",authMiddleware, PostService.getAllProject);
 
 
 

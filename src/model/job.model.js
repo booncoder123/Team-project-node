@@ -26,6 +26,10 @@ const Job = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       default: '',
     },
+    applyLink: {
+      type: String,
+      lowercase: true,
+    },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
 );
