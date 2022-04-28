@@ -657,6 +657,7 @@ async function getAllProject(req, res, next) {
         {
           $match: {
             userId: mongoose.Types.ObjectId(userId),
+            postType: 'project',
           },
         },
       ]);
