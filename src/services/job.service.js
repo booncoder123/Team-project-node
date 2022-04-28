@@ -78,9 +78,9 @@ async function deleteJobByJobId(req, res, next) {
   try {
     const { jobId } = req.body;
 
-    const job = await Job.findOne({ jobId });
+    const job = await Job.findOne({ _id: jobId });
     if (job) {
-      const deleteJob = await Job.findOneAndDelete({ jobId });
+      const deleteJob = await Job.findOneAndDelete({ _id: jobId });
       res.status(200).json({ message: 'Job deleted successfully', data: deleteJob });
     } else {
       res.status(404).json({ message: 'Job not found' });
