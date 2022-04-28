@@ -660,7 +660,7 @@ async function getAllProject(req, res, next) {
   try {
     const user = await User.findOne({ uid: req.uid });
     if (user) {
-      const userId = user._id;
+      const { _id: userId } = user;
       const posts = await Post.aggregate([
         {
           $lookup: {
