@@ -629,29 +629,6 @@ async function getAllNews(req, res, next) {
     next(error);
   }
 }
-async function getAllJob(req, res, next) {
-  const session = await Post.startSession();
-  session.startTransaction();
-
-  try {
-    const user = await User.findOne({ uid: req.uid });
-    if (user) {
-      const userId = user._id;
-      const posts = await Post.find({ postType: 'job', userId: userId });
-      res.status(200).json({ message: 'Posts fetched successfully', data: posts });
-
-      await session.commitTransaction();
-      session.endSession();
-    } else {
-      throw new Error('User not found');
-    }
-  } catch (error) {
-    console.log(error);
-    await session.commitTransaction();
-    session.endSession();
-    next(error);
-  }
-}
 
 async function getAllProject(req, res, next) {
   const session = await Post.startSession();
@@ -715,6 +692,5 @@ export default {
   getDisscusionPostByUid,
   getAllDiscussion,
   getAllNews,
-  getAllJob,
   getAllProject,
 };

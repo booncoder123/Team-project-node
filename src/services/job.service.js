@@ -9,25 +9,23 @@ async function createJob(req, res, next) {
   session.startTransaction();
 
   try {
-    const { description, companyName, types, title,applyLink } = req.body;
+    const { description, companyName, types, title, applyLink } = req.body;
     const { uid } = req;
     const user = await User.findOne({ uid });
     if (user) {
-      const { files ,file} = req;
+      const { files, file } = req;
       const { _id } = user;
-      console.log(files)
-  
-
+      console.log(files);
 
       const paths = await s3Service.uploadFiles(files, _id, 'jobs');
       const newJob = new Job({
-        description, 
+        description,
         companyName,
         types,
         title,
         images: paths,
         userId: _id,
-        applyLink
+        applyLink,
       });
 
       await newJob.save();
@@ -123,7 +121,7 @@ async function getJobByJobId(req, res, next) {
   try {
     const { jobId } = req.body;
     console.log(jobId);
-    const job = await Job.findOne({_id : jobId});
+    const job = await Job.findOne({ _id: jobId });
     if (job) {
       res.status(200).json({ message: 'Job fetched successfully', data: job });
     } else {
@@ -140,4 +138,31 @@ async function getJobByJobId(req, res, next) {
   }
 }
 
-export default { createJob, updateJobByJobId, deleteJobByJobId, getAllJobs, getJobByJobId };
+const getJobsByUid = async (req, res, next) => {
+  const session = await Job.startSession();
+  session.startTransaction();
+
+  try {
+    const { uid } = req;
+    const user = await User.findOne({ uid });
+    console.log('hello');
+    if (user) {
+      const { _id } = user;
+      const jobs = await Job.find({ userId: _id });
+
+      res.status(200).json({ message: 'Jobs fetched successfully', data: jobs });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.commitTransaction();
+    session.endSession();
+
+    next(error);
+  }
+};
+
+export default { createJob, updateJobByJobId, deleteJobByJobId, getAllJobs, getJobByJobId, getJobsByUid };
