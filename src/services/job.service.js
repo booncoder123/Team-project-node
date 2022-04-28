@@ -74,6 +74,7 @@ async function updateJobByJobId(req, res, next) {
 async function deleteJobByJobId(req, res, next) {
   const session = await Job.startSession();
   session.startTransaction();
+  console.log('hello', req.body.jobId);
 
   try {
     const { jobId } = req.body;

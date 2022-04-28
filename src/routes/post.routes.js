@@ -47,12 +47,7 @@ router.put(
   multer({ dest: 'temp/', fileFilter }).array('images', 10),
   PostService.updateProject,
 );
-router.delete(
-  '/project',
-  authMiddleware,
-  multer({ dest: 'temp/', fileFilter }).array('images', 10),
-  PostService.deleteProject,
-);
+router.delete('/project', PostService.deleteProject);
 router.get('/project/projectId', PostService.getProjectById);
 router.get('/get-disscusion-post-by-uid', authMiddleware, PostService.getDisscusionPostByUid);
 

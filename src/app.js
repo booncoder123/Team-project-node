@@ -29,7 +29,7 @@ async function startServer() {
   // );
 
   app.use('/', (req, res, next) => {
-    res.status(200).send('SE AUTHORIZATION SERVER');
+    res.status(200).send('you put the wrong url,check your url');
   });
 
   app

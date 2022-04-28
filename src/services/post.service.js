@@ -437,8 +437,7 @@ async function deleteProject(req, res, next) {
   try {
     const { postId } = req.body;
     const { uid } = req;
-    const user = await User.findOne({ uid: uid });
-
+    console.log(postId);
     const isPostExist = await Post.findOne({ _id: postId });
     if (isPostExist) {
       const deletedPost = await Post.findOneAndDelete({ _id: postId });
