@@ -60,6 +60,6 @@ router.get('/get-disscusion-post-by-uid', authMiddleware, PostService.getDisscus
 router.get('/discussion', authMiddleware, PostService.getAllDiscussion);
 router.get('/news', authMiddleware, PostService.getAllNews);
 // router.get('/job', authMiddleware, PostService.getAllJob);
-router.get('/project', authMiddleware, PostService.getAllProject);
+router.get('/projects', authMiddleware, PostService.getAllProject);
 
 export default router;

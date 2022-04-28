@@ -633,11 +633,13 @@ async function getAllNews(req, res, next) {
 async function getAllProject(req, res, next) {
   const session = await Post.startSession();
   session.startTransaction();
+  console.log('heko');
 
   try {
     const user = await User.findOne({ uid: req.uid });
     if (user) {
       const { _id: userId } = user;
+
       const posts = await Post.aggregate([
         {
           $lookup: {
@@ -655,7 +657,7 @@ async function getAllProject(req, res, next) {
         },
         {
           $match: {
-            userId: userId,
+            userId: mongoose.Types.ObjectId(userId),
           },
         },
       ]);
