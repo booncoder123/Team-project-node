@@ -29,7 +29,7 @@ async function startServer() {
   // );
 
   app.use('/', (req, res, next) => {
-    res.status(200).send('you put the wrong url,check your url');
+    res.status(200).send('welcome to development server');
   });
 
   app
