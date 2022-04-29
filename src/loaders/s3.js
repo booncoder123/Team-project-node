@@ -1,12 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import aws from 'aws-sdk';
+import { fileURLToPath } from 'url';
 import config from '../config/index.js';
 
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 aws.config.setPromisesDependency();
 aws.config.update({
@@ -15,8 +14,10 @@ aws.config.update({
   region: config.aws.region,
 });
 
-const s3 = new aws.S3();
-//upload a file to s3
+export default aws;
+
+// const s3 = new aws.S3();
+// upload a file to s3
 // async function uploadFile(file,userId)  {
 //     const fileStream = fs.createReadStream(file.path)
 //     const uploadParams = {
