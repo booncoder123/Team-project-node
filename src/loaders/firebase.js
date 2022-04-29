@@ -10,7 +10,9 @@ const firebase = initializeApp({
     type: config.firebase.type,
     project_id: config.firebase.projectId,
     private_key_id: config.firebase.privateKeyId,
-    private_key: process.env.FIREBASE_PRIVATE_KEY,
+    private_key: process.env.FIREBASE_PRIVATE_KEY
+      ? Buffer.from(process.env.FIREBASE_PRIVATE_KEY, 'base64').toString().replace(/\\n/g, '\n')
+      : undefined,
     client_email: config.firebase.clientEmail,
     client_id: config.firebase.clientId,
     auth_uri: config.firebase.authUri,
