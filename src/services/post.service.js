@@ -666,7 +666,7 @@ async function getAllProject(req, res, next) {
       await session.commitTransaction();
       session.endSession();
     } else {
-      throw new Error('User not found');
+      throw new Error('User not found!');
     }
   } catch (error) {
     console.log(error);
