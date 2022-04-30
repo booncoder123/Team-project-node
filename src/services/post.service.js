@@ -116,6 +116,7 @@ async function getAllPost(req, res, next) {
         },
       },
     ]);
+
     res.status(200).json({ message: 'Posts fetched successfully', data: posts });
 
     await session.commitTransaction();

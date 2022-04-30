@@ -29,7 +29,7 @@ async function startServer() {
   // );
 
   app.use('/', (req, res, next) => {
-    res.status(200).send('you put the wrong url,check your urll');
+    res.status(200).send('Im here');
   });
 
   app

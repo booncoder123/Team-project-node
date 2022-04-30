@@ -29,9 +29,9 @@ async function createJob(req, res, next) {
       });
 
       await newJob.save();
-      res.status(201).json({ message: 'Job created successfully', data: newJob });
+      res.status(201).json({ message: 'Job created successfully here', data: newJob });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(500).json({ message: 'User not found' });
     }
 
     await session.commitTransaction();
