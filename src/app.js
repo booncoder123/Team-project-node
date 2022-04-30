@@ -29,7 +29,7 @@ async function startServer() {
   // );
 
   app.use('/', (req, res, next) => {
-    res.status(200).send('Im here');
+    res.status(200).send('Im here pls');
   });
 
   app
