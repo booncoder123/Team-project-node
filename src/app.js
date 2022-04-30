@@ -29,7 +29,7 @@ async function startServer() {
   // );
 
   app.use('/', (req, res, next) => {
-    res.status(200).send('welcome to development server');
+    res.status(200).send('welcome to development server service');
   });
 
   app
