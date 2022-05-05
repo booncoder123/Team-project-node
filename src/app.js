@@ -7,7 +7,7 @@ import multer from 'multer';
 import userRoute from './routes/user.routes.js';
 import cors from 'cors';
 
-async function startServer() {
+export async function startServer() {
   const app = express();
   app.use(cors());
   await connectMongo();
@@ -15,18 +15,6 @@ async function startServer() {
   app.use(express.urlencoded({ extended: false }));
   app.use('/v1', apiv1Routes);
   app.use(ErrorHandler);
-
-  // app.post(
-  //   '/images/:userId',
-  //   multer({
-  //     dest: 'uploads/',
-  //   }).array('images', 10),
-  //   async (req, res) => {
-  //     const images = req.files;
-  //     const result = await uploadManyFile(images, '123', 'test');
-  //     res.send(result);
-  //   },
-  // );
 
   app.use('/', (req, res, next) => {
     res.status(200).send('Im here pls');
@@ -46,5 +34,8 @@ async function startServer() {
       res.status(200).send(err);
       // process.exit(1);
     });
+  return app;
 }
-startServer();
+// startServer();
+const app = await startServer();
+export default app;

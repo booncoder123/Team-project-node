@@ -245,7 +245,6 @@ async function getPostByPostId(req, res, next) {
 
   try {
     const { postId } = req.body;
-    console.log(postId);
 
     const post = await Post.findOne({ _id: postId });
 
