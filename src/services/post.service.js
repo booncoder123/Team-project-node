@@ -276,26 +276,24 @@ async function putLike(req, res, next) {
       const post = await Post.findOne({ _id: postId });
       if (post) {
         const { likers } = post;
-        console.log(likers);
 
         const { _id: userId } = user;
 
         if (likers.includes(userId)) {
-          // const likers = post.likers.filter(liker => liker !== _id);
-          const updatePost = await Post.findOneAndUpdate(
-            { _id: postId },
-            { $pull: { likers: mongoose.Types.ObjectId(userId) } },
-            { new: true },
-          );
-
-          res.status(201).json({ message: 'Post updated successfully(unlike)', data: updatePost });
-        } else {
           const updatePost = await Post.findOneAndUpdate(
             { _id: postId },
             { $push: { likers: mongoose.Types.ObjectId(userId) } },
             { new: true },
           );
+
           res.status(201).json({ message: 'Post updated successfully(like)', data: updatePost });
+        } else {
+          const updatePost = await Post.findOneAndUpdate(
+            { _id: postId },
+            { $pull: { likers: mongoose.Types.ObjectId(userId) } },
+            { new: true },
+          );
+          res.status(201).json({ message: 'Post updated successfully(unlike)', data: updatePost });
         }
       } else {
         throw new Error('Post not found');
