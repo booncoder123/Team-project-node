@@ -271,6 +271,7 @@ async function putLike(req, res, next) {
     const { postId } = req.body;
     const { uid } = req;
     const user = await User.findOne({ uid });
+    console.log('hello');
 
     if (user) {
       const post = await Post.findOne({ _id: postId });
@@ -279,18 +280,21 @@ async function putLike(req, res, next) {
 
         const { _id: userId } = user;
 
+        console.log(likers, userId);
         if (likers.includes(userId)) {
+          console.log('include');
           const updatePost = await Post.findOneAndUpdate(
             { _id: postId },
-            { $push: { likers: mongoose.Types.ObjectId(userId) } },
+            { $pull: { likers: mongoose.Types.ObjectId(userId) } },
             { new: true },
           );
 
           res.status(201).json({ message: 'Post updated successfully(like)', data: updatePost });
         } else {
+          console.log('not-include');
           const updatePost = await Post.findOneAndUpdate(
             { _id: postId },
-            { $pull: { likers: mongoose.Types.ObjectId(userId) } },
+            { $push: { likers: mongoose.Types.ObjectId(userId) } },
             { new: true },
           );
           res.status(201).json({ message: 'Post updated successfully(unlike)', data: updatePost });
